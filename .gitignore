@@ -1,0 +1,19 @@
+# Composer dependencies
+/vendor/
+
+# Environment variables and secrets
+/.env
+
+# IDE settings
+/.idea/
+/.vscode/
+
+# Logs
+*.log
+
+# PHPUnit cache
+/.phpunit.cache/
+
+# Operating system
+.DS_Store
+Thumbs.db
