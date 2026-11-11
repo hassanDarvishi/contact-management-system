@@ -1,3 +1,16 @@
+<?php
+$name = $old['name'] ?? null;
+$name = is_string($name) ? $name : '';
+
+$email = $old['email'] ?? null;
+$email = is_string($email) ? $email : '';
+
+$subject = $old['subject'] ?? null;
+$subject = is_string($subject) ? $subject : '';
+
+$message = $old['message'] ?? null;
+$message = is_string($message) ? $message : '';
+?>
 
 <div class="container py-5">
     <div class="row justify-content-center">
@@ -13,7 +26,11 @@
                             در اولین فرصت پاسخ خواهیم داد.
                         </p>
                     </div>
-
+                    <?php if (!empty($success)): ?>
+                        <div class="alert alert-success">
+                            <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
+                        </div>
+                    <?php endif; ?>
                     <form action="/contact" method="POST">
 
                         <div class="mb-3">
@@ -23,12 +40,16 @@
 
                             <input
                                 type="text"
-                                class="form-control"
+                                class="form-control <?= isset($errors['name']) ? 'is-invalid' : '' ?>"
                                 id="name"
                                 name="name"
-                                placeholder="نام خود را وارد کنید"
-                                required
-                            >
+                                value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>"
+                                placeholder="نام خود را وارد کنید">
+                            <?php if (isset($errors['name'])): ?>
+                                <div class="invalid-feedback">
+                                    <?= htmlspecialchars($errors['name'], ENT_QUOTES, 'UTF-8') ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="mb-3">
@@ -38,12 +59,16 @@
 
                             <input
                                 type="email"
-                                class="form-control"
+                                class="form-control <?= isset($errors['email']) ? 'is-invalid' : '' ?>"
                                 id="email"
                                 name="email"
-                                placeholder="example@email.com"
-                                required
-                            >
+                                value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>"
+                                placeholder="example@email.com">
+                            <?php if (isset($errors['email'])): ?>
+                                <div class="invalid-feedback">
+                                    <?= htmlspecialchars($errors['email'], ENT_QUOTES, 'UTF-8') ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="mb-3">
@@ -53,12 +78,17 @@
 
                             <input
                                 type="text"
-                                class="form-control"
+                                class="form-control <?= isset($errors['subject']) ? 'is-invalid' : '' ?>"
                                 id="subject"
                                 name="subject"
-                                placeholder="موضوع پیام را وارد کنید"
-                                required
-                            >
+                                value="<?= htmlspecialchars($subject, ENT_QUOTES, 'UTF-8') ?>"
+                                placeholder="موضوع پیام را وارد کنید">
+
+                            <?php if (isset($errors['subject'])): ?>
+                                <div class="invalid-feedback">
+                                    <?= htmlspecialchars($errors['subject'], ENT_QUOTES, 'UTF-8') ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <div class="mb-4">
@@ -67,13 +97,17 @@
                             </label>
 
                             <textarea
-                                class="form-control"
+                                class="form-control <?= isset($errors['message']) ? 'is-invalid' : '' ?>"
                                 id="message"
                                 name="message"
                                 rows="6"
-                                placeholder="پیام خود را بنویسید..."
-                                required
-                            ></textarea>
+                                placeholder="پیام خود را بنویسید..."><?= htmlspecialchars($message, ENT_QUOTES, 'UTF-8') ?></textarea>
+
+                            <?php if (isset($errors['message'])): ?>
+                                <div class="invalid-feedback">
+                                    <?= htmlspecialchars($errors['message'], ENT_QUOTES, 'UTF-8') ?>
+                                </div>
+                            <?php endif; ?>
                         </div>
 
                         <button type="submit" class="btn btn-primary w-100">
