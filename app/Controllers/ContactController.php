@@ -6,6 +6,8 @@ namespace App\Controllers;
 
 use App\Core\View;
 use App\Validators\ContactValidator;
+use App\Core\Database;
+use App\Models\Message;
 
 /**
  * مدیریت درخواست‌های مربوط به فرم تماس.
@@ -13,6 +15,14 @@ use App\Validators\ContactValidator;
  */
 class ContactController
 {
+
+    /**
+     * مدل مدیریت پیام‌های تماس.
+     *
+     * @var Message
+     */
+
+    private Message $messageModel;
     /**
      * اعتبارسنج فرم تماس.
      *
@@ -20,16 +30,21 @@ class ContactController
      */
 
     private ContactValidator $validator;
+
     /**
      * ساخت نمونه Controller و دریافت Validator.
-     * 
+     * ساخت کنترلر و دریافت وابستگی‌های موردنیاز.
      * @param ContactValidator $validator ابزار اعتبارسنجی فرم
-     * 
+     * @param Message $messageModel مدل مدیریت پیام‌ها
      * @return void
      */
-    public function __construct(ContactValidator $validator)
-    {
+
+    public function __construct(
+        ContactValidator $validator,
+        Message $messageModel
+    ) {
         $this->validator = $validator;
+        $this->messageModel = $messageModel;
     }
 
     /**
@@ -72,12 +87,33 @@ class ContactController
             ]);
             return;
         }
-        http_response_code(200);
-        View::render('contact/index', [
-            'title' => 'تماس با ما',
-            'errors' => [],
-            'old' => [],
-            'success'=> 'اطلاعات با موفقیت اعتبارسنجی شد!'
-        ]);
+
+        try {
+            $messageId = $this->messageModel->create(
+                trim($data['name']),
+                trim($data['email']),
+                trim($data['subject']),
+                trim($data['message'])
+
+            );
+
+            http_response_code(200);
+            View::render('contact/index', [
+                'title' => 'تماس با ما',
+                'errors' => [],
+                'old' => [],
+                'success' => 'اطلاعات با موفقیت اعتبارسنجی شد!'
+            ]);
+        } catch (\PDOException $exeption) {
+            error_log($exeption->getMessage());
+
+            http_response_code(500);
+            View::render('contact/index', [
+                'title' => 'تماس با ما',
+                'errors' => [],
+                'old' => $data,
+                'error' => 'درحال حاضر امکان ثبت پیام وجود ندارد. لطفا دوباره تلاش کنید.'
+            ]);
+        }
     }
 }

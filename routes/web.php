@@ -7,13 +7,15 @@ use App\Validators\ContactValidator;
 use App\Core\Router;
 use App\Core\View;
 use App\Core\Session;
+use App\Core\Database;
+use App\Models\Message;
 
 
 
 return function (Router $router): void {
-
-    $contactController = new ContactController(
-    new ContactValidator()
+$contactController = new ContactController(
+    new ContactValidator(),
+    new Message(Database::getConnection())
 );
 
     $router->get('/', [$contactController, 'index']);

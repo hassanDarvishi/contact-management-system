@@ -7,12 +7,14 @@ namespace Tests\Feature;
 use App\Controllers\ContactController;
 use App\Validators\ContactValidator;
 use PHPUnit\Framework\TestCase;
+use App\Models\Message;
+use PDO;
 
 
 class ContactControllerTest extends TestCase
 {
     /**
-     * آماده سازی متغیر های عمومی قبل از هر تست
+     * آماده‌سازی متغیرهای عمومی قبل از هر تست.
      *
      * @return void
      */
@@ -25,7 +27,7 @@ class ContactControllerTest extends TestCase
     }
 
     /**
-     *  پاکسازی متغیرهای عمومی پس از هر تست.
+     * پاک‌سازی متغیرهای عمومی پس از هر تست.
      *
      * @return void
      */
@@ -46,8 +48,11 @@ class ContactControllerTest extends TestCase
      */
     public function testIndexDisplaysContactForm(): void
     {
+
+        $messageModel = $this->createStub(Message::class);
         $controller = new ContactController(
-            new ContactValidator()
+            new ContactValidator(),
+            $messageModel
         );
 
         ob_start();
@@ -74,8 +79,11 @@ class ContactControllerTest extends TestCase
             'message' => '',
         ];
 
+
+        $messageModel = $this->createStub(Message::class);
         $controller = new ContactController(
-            new ContactValidator()
+            new ContactValidator(),
+            $messageModel
         );
 
         ob_start();
@@ -98,7 +106,7 @@ class ContactControllerTest extends TestCase
     }
 
     /**
-     *بررسی پذیرش اطلاعات معتبر فرم.
+     * بررسی پذیرش اطلاعات معتبر فرم.
      *
      * @return void
      */
@@ -111,15 +119,31 @@ class ContactControllerTest extends TestCase
             'message' => 'این یک پیام آزمایشی است.',
         ];
 
+
+        $messageModel = $this->createMock(Message::class);
+        $messageModel
+            ->expects($this->once())
+            ->method('create')
+            ->with(
+                'Ali Rezaei',
+                'ali@example.com',
+                'درخواست همکاری',
+                'این یک پیام آزمایشی است.',
+            )
+            ->willReturn(1);
         $controller = new ContactController(
-            new ContactValidator()
+            new ContactValidator(),
+            $messageModel
         );
 
         ob_start();
 
-        $controller->store();
-
-        $output = ob_get_clean();
+        try {
+            $controller->store();
+            $output = ob_get_contents();
+        } finally {
+            ob_end_clean();
+        }
 
         $this->assertSame(200, http_response_code());
 
@@ -130,7 +154,7 @@ class ContactControllerTest extends TestCase
     }
 
     /**
-     * بررسی جلوگیری از اجرای متد با درخواست غیر از POST.
+     * بررسی جلوگیری از اجرای متد با درخواست غیر POST.
      *
      * @return void
      */
@@ -138,8 +162,11 @@ class ContactControllerTest extends TestCase
     {
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
+
+        $messageModel = $this->createStub(Message::class);
         $controller = new ContactController(
-            new ContactValidator()
+            new ContactValidator(),
+            $messageModel
         );
 
         ob_start();
@@ -156,5 +183,3 @@ class ContactControllerTest extends TestCase
         );
     }
 }
-
-

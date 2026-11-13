@@ -31,6 +31,11 @@ $message = is_string($message) ? $message : '';
                             <?= htmlspecialchars($success, ENT_QUOTES, 'UTF-8') ?>
                         </div>
                     <?php endif; ?>
+                    <?php if (!empty($error)): ?>
+                        <div class="alert alert-danger" role="alert">
+                            <?= htmlspecialchars($error, ENT_QUOTES, 'UTF-8') ?>
+                        </div>
+                    <?php endif; ?>
                     <form action="/contact" method="POST">
 
                         <div class="mb-3">
