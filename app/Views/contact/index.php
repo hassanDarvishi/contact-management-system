@@ -1,15 +1,17 @@
 <?php
-$name = $old['name'] ?? null;
+
+$name = $old['name'] ?? '';
 $name = is_string($name) ? $name : '';
 
-$email = $old['email'] ?? null;
+$email = $old['email'] ?? '';
 $email = is_string($email) ? $email : '';
 
-$subject = $old['subject'] ?? null;
+$subject = $old['subject'] ?? '';
 $subject = is_string($subject) ? $subject : '';
 
-$message = $old['message'] ?? null;
+$message = $old['message'] ?? '';
 $message = is_string($message) ? $message : '';
+
 ?>
 
 <div class="container py-5">
@@ -37,7 +39,14 @@ $message = is_string($message) ? $message : '';
                         </div>
                     <?php endif; ?>
                     <form action="/contact" method="POST">
-
+                        <input
+                            type="hidden"
+                            name="_token"
+                            value="<?= htmlspecialchars(
+                                        \App\Core\Csrf::token(),
+                                        ENT_QUOTES,
+                                        'UTF-8'
+                                    ) ?>">
                         <div class="mb-3">
                             <label for="name" class="form-label">
                                 نام و نام خانوادگی

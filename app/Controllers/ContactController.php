@@ -8,6 +8,9 @@ use App\Core\View;
 use App\Validators\ContactValidator;
 use App\Core\Database;
 use App\Models\Message;
+use App\Core\Csrf;
+use App\Core\Session;
+
 
 /**
  * مدیریت درخواست‌های مربوط به فرم تماس.
@@ -54,10 +57,13 @@ class ContactController
      */
     public function index(): void
     {
+        $success = Session::getFlash('success');
+
         View::render('contact/index', [
             'title' => 'تماس با ما',
             'errors' => [],
-            'old' => []
+            'old' => [],
+            'success' => $success
         ]);
     }
 
@@ -74,6 +80,12 @@ class ContactController
             return;
         }
 
+        if (!Csrf::validate($_POST['_token'] ?? null)) {
+            http_response_code(419);
+
+            echo 'درخواست نامعتبر است یا نشست شما منقضی شده است. لطفا صفحه را دوباره بارگذاری کنید.';
+            return;
+        }
         $data = $_POST;
 
         $errors = $this->validator->validate($data);
@@ -83,7 +95,8 @@ class ContactController
             View::render('contact/index', [
                 'title' => 'تماس با ما',
                 'errors' => $errors,
-                'old' => $data
+                'old' => $data,
+                'success' => null,
             ]);
             return;
         }
@@ -97,13 +110,16 @@ class ContactController
 
             );
 
-            http_response_code(200);
-            View::render('contact/index', [
-                'title' => 'تماس با ما',
-                'errors' => [],
-                'old' => [],
-                'success' => 'اطلاعات با موفقیت اعتبارسنجی شد!'
-            ]);
+            Csrf::regenerate();
+
+            Session::flash(
+                'success',
+                'پیام شما با موفقیت ثبت شد.'
+            );
+
+            header('Location: /contact', true, 303);
+            exit;
+
         } catch (\PDOException $exeption) {
             error_log($exeption->getMessage());
 
@@ -112,6 +128,7 @@ class ContactController
                 'title' => 'تماس با ما',
                 'errors' => [],
                 'old' => $data,
+                'success' => null,
                 'error' => 'درحال حاضر امکان ثبت پیام وجود ندارد. لطفا دوباره تلاش کنید.'
             ]);
         }

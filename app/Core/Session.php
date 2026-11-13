@@ -8,7 +8,7 @@ class Session
 {
     public static function start(): void
     {
-        if(session_status() === PHP_SESSION_NONE) {
+        if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
     }
@@ -22,7 +22,7 @@ class Session
     {
         return $_SESSION[$key] ?? $default;
     }
-    
+
     public static function flash(string $key, string $message): void
     {
         $_SESSION['_flash'][$key] = $message;
@@ -34,5 +34,14 @@ class Session
         unset($_SESSION['_flash'][$key]);
         return $message;
     }
-
+    /**
+     * حذف یک مقدار از Session.
+     *
+     * @param string $key نام کلید موردنظر
+     * @return void
+     */
+    public static function remove(string $key): void
+    {
+        unset($_SESSION[$key]);
+    }
 }
